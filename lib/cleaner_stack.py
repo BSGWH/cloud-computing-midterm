@@ -1,7 +1,5 @@
 from aws_cdk import (
     aws_lambda as _lambda,
-    aws_events as events,
-    aws_events_targets as targets,
     Stack,
     Duration,
 )
@@ -17,8 +15,8 @@ class CleanerStack(Stack):
             self, "CleanerHandler",
             runtime=_lambda.Runtime.PYTHON_3_9,
             handler="cleaner_lambda.handler",
-            code=_lambda.Code.from_asset("lambda"),  # Specify correct path
-            timeout=Duration.seconds(30),  # Increased timeout to accommodate processing
+            code=_lambda.Code.from_asset("lambda"),
+            timeout=Duration.seconds(30),
             environment={
                 "TABLE_NAME": storage_stack.table.table_name,
                 "DST_BUCKET": storage_stack.bucket_dst.bucket_name
@@ -28,10 +26,3 @@ class CleanerStack(Stack):
         # Grant permissions
         storage_stack.table.grant_read_write_data(cleaner_lambda)
         storage_stack.bucket_dst.grant_delete(cleaner_lambda)
-
-        # Set up CloudWatch event rule to run every minute
-        rule = events.Rule(
-            self, "CleanerScheduleRule",
-            schedule=events.Schedule.rate(Duration.minutes(1))
-        )
-        rule.add_target(targets.LambdaFunction(cleaner_lambda))

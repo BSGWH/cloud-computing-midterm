@@ -11,7 +11,7 @@ def handler(event, context):
     current_time = int(time.time())
     dst_bucket = os.environ["DST_BUCKET"]
 
-    # Define the threshold (e.g., items disowned for more than 10 seconds)
+    # Define the threshold (items disowned for more than 10 seconds)
     threshold = current_time - 10  # 10 seconds ago
 
     # Query the GSI for disowned items older than the threshold

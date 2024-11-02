@@ -5,6 +5,7 @@ from aws_cdk import (
     aws_lambda_event_sources as lambda_event_sources,
     Stack,
     Duration,
+    aws_iam as iam,
 )
 from constructs import Construct
 
@@ -42,8 +43,12 @@ class StorageAndProcessingStack(Stack):
         )
 
         # Grant permissions
-        self.table.grant_read_write_data(replicator_lambda)
-        self.bucket_dst.grant_put(replicator_lambda)
+        replicator_lambda.role.add_managed_policy(
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess")
+        )
+        replicator_lambda.role.add_managed_policy(
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonDynamoDBFullAccess")
+        )
 
         # Add S3 event source
         replicator_lambda.add_event_source(
@@ -67,5 +72,10 @@ class StorageAndProcessingStack(Stack):
         )
 
         # Grant permissions
-        self.table.grant_read_write_data(cleaner_lambda)
-        self.bucket_dst.grant_delete(cleaner_lambda)
+        cleaner_lambda.role.add_managed_policy(
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess")
+        )
+
+        cleaner_lambda.role.add_managed_policy(
+            iam.ManagedPolicy.from_aws_managed_policy_name("AmazonDynamoDBFullAccess")
+        )

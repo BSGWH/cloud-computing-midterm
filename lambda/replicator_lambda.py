@@ -47,6 +47,7 @@ def handler(event, context):
             table.put_item(Item={
                 "object_name": object_key,
                 "copy_id": copy_id,
+                "dst_object_name": copy_id,
                 "status": "active"
             })
 

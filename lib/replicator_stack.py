@@ -5,7 +5,7 @@ from aws_cdk import (
     Stack,
 )
 from constructs import Construct
-from .storage_stack import StorageStack
+from .storage_and_processing_stack import StorageStack
 
 class ReplicatorStack(Stack):
     def __init__(self, scope: Construct, id: str, storage_stack: StorageStack, **kwargs) -> None:

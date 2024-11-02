@@ -1,7 +1,7 @@
 import boto3
 import os
 import time
-from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.conditions import Attr
 
 s3 = boto3.client("s3")
 dynamodb = boto3.resource("dynamodb")
@@ -14,10 +14,9 @@ def handler(event, context):
     # Define the threshold (items disowned for more than 10 seconds)
     threshold = current_time - 10  # 10 seconds ago
 
-    # Query the GSI for disowned items older than the threshold
-    response = table.query(
-        IndexName="DisownedIndex",
-        KeyConditionExpression=Key('status').eq("disowned") & Key('disown_timestamp').lte(threshold)
+    # Scan for disowned items older than the threshold
+    response = table.scan(
+        FilterExpression=Attr('status').eq("disowned") & Attr('disown_timestamp').lte(threshold)
     )
 
     if response['Items']:
